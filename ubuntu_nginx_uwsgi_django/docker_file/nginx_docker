@@ -1,0 +1,34 @@
+FROM ubuntu:16.04
+COPY ./sources.list /etc/apt/
+RUN  apt-get update \
+	&&  apt-get install -y python \
+	&& apt-get install -y python-dev python-setuptools python-pip \
+	&& apt-get install -y libpcre3 libpcre3-dev \
+	&& apt-get install -y openssl libssl-dev \
+	&& apt-get install -y libmysqld-dev \
+	&& apt-get install -y libmysqlclient-dev \
+	&& apt-get install -y supervisor \
+	&& apt-get install -y git \
+	&& apt-get install -y vim \
+	&& apt-get install -y nginx \
+        && pip install --upgrade pip	
+
+WORKDIR /home/tq/
+RUN  mkdir /etc/uwsgi/sites -p 
+COPY ./conf/requirement.txt /home/tq/conf/requirement.txt
+RUN pip install -r /home/tq/conf/requirement.txt
+RUN git clone https://github.com/newvem/pytz \
+	&& cd /home/tq/pytz \
+	&& python setup.py install
+
+EXPOSE 80
+EXPOSE 8081
+EXPOSE 8082
+EXPOSE 8080
+
+COPY . /home/tq/
+RUN (ln -s /home/tq/conf/bank /etc/nginx/sites-enabled/bank \
+	&& ln -s /home/tq/conf/bank.ini /etc/uwsgi/sites \
+	&& ln -s /home/tq/conf/service.conf /etc/supervisor/conf.d/service.conf)
+
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/service.conf"]

@@ -1,0 +1,15 @@
+#ps -ef | grep celery | grep -v grep | ps -ef | grep celery | grep -v grep | awk '{print $2}' | xargs kill -9
+#celery -A xagent_server beat -l info
+#celery -A xagent_server worker -l info
+uwsgi
+django==1.10
+django-redis-cache
+requests
+celery
+paramiko
+M2Crypto
+pycrypto
+rabbit
+Pyyaml
+hiredis
+mysql-python
